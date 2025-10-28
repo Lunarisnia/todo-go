@@ -6,24 +6,20 @@ import (
 )
 
 type HandlerFunc func(http.ResponseWriter, *http.Request)
-type Middleware HandlerFunc
 
 type Server interface {
 	Serve(addr string)
 	Get(path string, handlerFunc HandlerFunc)
 	Post(path string, handlerFunc HandlerFunc)
-	AddMiddleware(middleware Middleware)
 }
 
 type serverImpl struct {
-	server      *http.Server
-	middlewares []Middleware
+	server *http.Server
 }
 
 func NewServer() Server {
 	return &serverImpl{
-		server:      &http.Server{},
-		middlewares: make([]Middleware, 0),
+		server: &http.Server{},
 	}
 }
 
@@ -32,9 +28,6 @@ func (s serverImpl) Get(path string, handlerFunc HandlerFunc) {
 		if r.Method != http.MethodGet {
 			http.NotFound(w, r)
 			return
-		}
-		for _, m := range s.middlewares {
-			m(w, r)
 		}
 		handlerFunc(w, r)
 	})
@@ -46,15 +39,8 @@ func (s serverImpl) Post(path string, handlerFunc HandlerFunc) {
 			http.NotFound(w, r)
 			return
 		}
-		for _, m := range s.middlewares {
-			m(w, r)
-		}
 		handlerFunc(w, r)
 	})
-}
-
-func (s *serverImpl) AddMiddleware(middleware Middleware) {
-	s.middlewares = append(s.middlewares, middleware)
 }
 
 func (s serverImpl) Serve(addr string) {

@@ -1,7 +1,6 @@
 package todo
 
 import (
-	"github.com/lunarisnia/todo-go/internal/middleware"
 	"github.com/lunarisnia/todo-go/internal/server"
 	"github.com/lunarisnia/todo-go/internal/todo/todoctl"
 	"github.com/lunarisnia/todo-go/internal/todo/todosvc"
@@ -12,7 +11,6 @@ func Run() {
 
 	todoService := todosvc.NewToDoService()
 	todoController := todoctl.NewToDoController(todoService)
-	s.AddMiddleware(middleware.LogRequest)
 	s.Get("/todo", todoController.GetTasks)
 	s.Post("/todo/create", todoController.CreateTask)
 	s.Serve(":3000")
