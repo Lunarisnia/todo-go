@@ -25,11 +25,9 @@ func Run() {
 		log.Fatalln(err)
 	}
 	staticDir := filepath.Join(cwd, "static")
-	f, err := os.ReadFile(staticDir + "/hello.txt")
-	fmt.Println(string(f))
-
 	fs := http.FileServer(http.Dir(staticDir))
 	s.Get("/static/", http.StripPrefix("/static/", fs).ServeHTTP)
+
 	s.Get("/todo", todoController.GetTasks)
 	s.Post("/todo/create", todoController.CreateTask)
 	s.Serve(":3000")
