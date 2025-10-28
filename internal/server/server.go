@@ -5,13 +5,13 @@ import (
 	"net/http"
 )
 
-type Handler func(http.ResponseWriter, *http.Request)
-type Middleware Handler
+type HandlerFunc func(http.ResponseWriter, *http.Request)
+type Middleware HandlerFunc
 
 type Server interface {
 	Serve(addr string)
-	Get(path string, handler Handler)
-	Post(path string, handler Handler)
+	Get(path string, handlerFunc HandlerFunc)
+	Post(path string, handlerFunc HandlerFunc)
 	AddMiddleware(middleware Middleware)
 }
 
@@ -27,7 +27,7 @@ func NewServer() Server {
 	}
 }
 
-func (s serverImpl) Get(path string, handler Handler) {
+func (s serverImpl) Get(path string, handlerFunc HandlerFunc) {
 	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodGet {
 			http.NotFound(w, r)
@@ -36,11 +36,11 @@ func (s serverImpl) Get(path string, handler Handler) {
 		for _, m := range s.middlewares {
 			m(w, r)
 		}
-		handler(w, r)
+		handlerFunc(w, r)
 	})
 }
 
-func (s serverImpl) Post(path string, handler Handler) {
+func (s serverImpl) Post(path string, handlerFunc HandlerFunc) {
 	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.NotFound(w, r)
@@ -49,7 +49,7 @@ func (s serverImpl) Post(path string, handler Handler) {
 		for _, m := range s.middlewares {
 			m(w, r)
 		}
-		handler(w, r)
+		handlerFunc(w, r)
 	})
 }
 
