@@ -10,6 +10,7 @@ import (
 type ToDoService interface {
 	CreateTask(ctx context.Context, taskRequest task.TaskRequest) error
 	GetTasks(ctx context.Context) ([]task.Task, error)
+	GetTaskCount(ctx context.Context) int
 }
 
 type todoServiceImpl struct {
@@ -44,4 +45,8 @@ func (t todoServiceImpl) GetTasks(ctx context.Context) ([]task.Task, error) {
 	}
 
 	return tasks, nil
+}
+
+func (t todoServiceImpl) GetTaskCount(ctx context.Context) int {
+	return len(t.TaskStorage)
 }

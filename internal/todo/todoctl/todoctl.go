@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/lunarisnia/todo-go/internal/page"
 	"github.com/lunarisnia/todo-go/internal/todo/todosvc"
 	"github.com/lunarisnia/todo-go/internal/todo/todosvc/task"
 )
@@ -13,6 +14,7 @@ import (
 type ToDoController interface {
 	CreateTask(w http.ResponseWriter, r *http.Request)
 	GetTasks(w http.ResponseWriter, r *http.Request)
+	GetTaskCount(w http.ResponseWriter, r *http.Request)
 }
 
 type todoControllerImpl struct {
@@ -60,4 +62,16 @@ func (t todoControllerImpl) GetTasks(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	fmt.Fprint(w, string(jsonByte))
+}
+
+func (t todoControllerImpl) GetTaskCount(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	count := t.ToDoService.GetTaskCount(ctx)
+
+	w.Header().Set("Content-Type", "text/html")
+	webpage := page.NewTaskCountPage()
+	webpage.Execute(w, page.TaskCountPageContent{
+		Count: count,
+	})
 }

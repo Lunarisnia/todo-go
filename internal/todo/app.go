@@ -29,5 +29,6 @@ func Run() {
 
 	s.Get("/todo", todoController.GetTasks)
 	s.Post("/todo/create", todoController.CreateTask)
+	s.Get("/todo/count", todoController.GetTaskCount)
 	s.Serve(":3000")
 }
