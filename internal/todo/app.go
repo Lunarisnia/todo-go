@@ -11,6 +11,7 @@ func Run() {
 
 	todoService := todosvc.NewToDoService()
 	todoController := todoctl.NewToDoController(todoService)
-	s.Post("/todo", todoController.CreateTask)
+	s.Get("/todo", todoController.GetTasks)
+	s.Post("/todo/create", todoController.CreateTask)
 	s.Serve(":3000")
 }

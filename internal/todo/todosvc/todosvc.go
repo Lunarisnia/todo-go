@@ -9,6 +9,7 @@ import (
 
 type ToDoService interface {
 	CreateTask(ctx context.Context, taskRequest task.TaskRequest) error
+	GetTasks(ctx context.Context) ([]task.Task, error)
 }
 
 type todoServiceImpl struct {
@@ -30,4 +31,17 @@ func (t todoServiceImpl) CreateTask(ctx context.Context, taskRequest task.TaskRe
 		Status:   false,
 	}
 	return nil
+}
+
+func (t todoServiceImpl) GetTasks(ctx context.Context) ([]task.Task, error) {
+	tasks := make([]task.Task, 0)
+	for _, tsk := range t.TaskStorage {
+		tasks = append(tasks, tsk)
+	}
+
+	if len(tasks) <= 0 {
+		return nil, errors.New("no task")
+	}
+
+	return tasks, nil
 }

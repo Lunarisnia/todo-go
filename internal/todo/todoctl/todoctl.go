@@ -12,6 +12,7 @@ import (
 
 type ToDoController interface {
 	CreateTask(w http.ResponseWriter, r *http.Request)
+	GetTasks(w http.ResponseWriter, r *http.Request)
 }
 
 type todoControllerImpl struct {
@@ -40,4 +41,23 @@ func (t todoControllerImpl) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	fmt.Fprint(w, "Created!")
+}
+
+func (t todoControllerImpl) GetTasks(w http.ResponseWriter, r *http.Request) {
+	ctx := context.Background()
+
+	tasks, err := t.ToDoService.GetTasks(ctx)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	jsonByte, err := json.Marshal(tasks)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprint(w, string(jsonByte))
 }
