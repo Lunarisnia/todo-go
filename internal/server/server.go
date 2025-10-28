@@ -9,7 +9,8 @@ type Handler func(http.ResponseWriter, *http.Request)
 
 type Server interface {
 	Serve(addr string)
-	Register(path string, handler Handler)
+	Get(path string, handler Handler)
+	Post(path string, handler Handler)
 }
 
 type serverImpl struct {
@@ -22,8 +23,24 @@ func NewServer() Server {
 	}
 }
 
-func (s serverImpl) Register(path string, handler Handler) {
-	http.HandleFunc(path, handler)
+func (s serverImpl) Get(path string, handler Handler) {
+	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.NotFound(w, r)
+			return
+		}
+		handler(w, r)
+	})
+}
+
+func (s serverImpl) Post(path string, handler Handler) {
+	http.HandleFunc(path, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.NotFound(w, r)
+			return
+		}
+		handler(w, r)
+	})
 }
 
 func (s serverImpl) Serve(addr string) {
